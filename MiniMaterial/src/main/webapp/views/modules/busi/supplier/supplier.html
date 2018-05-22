@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>供应商管理</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+<link rel="stylesheet" href="../../../../static/css/test/style.css" >    
+<link rel="stylesheet" href="../../../../static/css/address/city-picker.css"> 
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/js/common.js"></script>
+
+<script src="../../../../static/js/city-picker.data.js"></script>
+<script src="../../../../static/js/city-picker.js"></script>
+
+</head>
+<body>
+<div id="rrapp" v-clock>
+	<div v-show="showList">
+		<div class="panel panel-default">
+			<div class="panel-heading">查询条件</div>
+			<div class="panel-body">
+				<form id="formSearch" class="form-horizontal" style="margin-bottom: 10px; margin-top: 10px;">
+	                <div class="row" >
+	                	<div class="col-xs-4 col-md-4">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							        <label  class="btn btn-white">供应商名称</label>
+							    </div>
+							    <input type="text" class="form-control"  v-model="q.supplierName" @keyup.enter="query" placeholder="供应商名称">
+							</div>                            
+						</div>
+						<div class="col-xs-4 col-md-3">
+							<div class="col-xs-5"><a class="btn btn-info" @click="query" ><i class="fa fa-search"></i>查询</a></div>
+							<div class="col-xs-5"><a class="btn btn-info" @click="reset" ><i class="fa fa-refresh"></i>重置</a></div>
+						</div>
+              		 </div>
+                </form>		
+			</div>
+		</div> 
+		
+		<div style=" margin-bottom: 20px;">
+			<a v-if="hasPermission('busi:supplier:save')" class="btn btn-info" style="margin-right: 20px;" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			<a v-if="hasPermission('busi:supplier:update')" class="btn btn-info" style="margin-right: 20px;" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			<a v-if="hasPermission('busi:supplier:enable')" class="btn btn-info" style="margin-right: 20px;" @click="enable"><i class="fa fa-play"></i>&nbsp;启用</a>
+			<a v-if="hasPermission('busi:supplier:disable')" class="btn btn-info" style="margin-right: 20px;" @click="disable"><i class="fa fa-pause"></i>&nbsp;禁用</a>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">供应商列表</div>
+	        <div class="panel-body">
+			    <table id="jqGrid"></table>
+			    <div id="jqGridPager"></div>
+			</div>
+		</div>
+	</div>
+	
+ 	<div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+			<input type="hidden" id="id" name="id" class="form-control"  v-model="supplier.id"/>
+		<form class="form-horizontal" id="supplierForm" style="margin-top: 20px;" onkeydown="if(event.keyCode==13){return false;}">
+				<div class="form-group">
+					<div class="col-sm-1  control-label">供应商名称:</div>
+					<div class="col-sm-5">
+						<input maxlength="200" type="text" class="form-control" id="supplierName" name="supplierName" v-model="supplier.supplierName"  value=""  placeholder="供应商名称"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div  class="col-sm-1 control-label">负&nbsp;&nbsp;&nbsp;责&nbsp;&nbsp;&nbsp;人:</div>
+					<div class="col-sm-5">
+						<input maxlength="200" type="text" class="form-control" id="chargeName" name="chargeName"  v-model="supplier.chargeName" value="" placeholder="负责人"/>	
+					</div>
+				</div>
+				<!-- <div class="form-group">
+					<label  class="col-sm-1 control-label">供应商编号:</label>
+					<div class="col-sm-5">
+						<input   type="text" class="form-control" id="supplierCode" name="supplierCode" value="" v-model="supplier.supplierCode" placeholder="供应商编码" />	
+					</div>
+				</div> -->
+				<div class="form-group">
+				   	<div class="col-sm-1 control-label">供应商资质:</div>
+				   	<div class="col-sm-5">
+					   	<label v-for="qualifications in supplierQualificationsList" class="checkbox-inline">
+						  <input type="checkbox" style="margin-top: 2px;" v-bind:value="qualifications.code" name="supplierQualificationsList" v-model="supplier.supplierQualificationsList">{{qualifications.name}}
+						</label>
+<!-- 						  <label class="checkbox-inline"> -->
+<!-- 						  	<input type="checkbox" style="margin-top: 2px;" value="1"  name="supplierQualificationsList" v-model="supplier.supplierQualificationsList">办公室用品及耗材 -->
+<!-- 						  </label> -->
+<!-- 						  <label class="checkbox-inline"> -->
+<!-- 						  	<input type="checkbox" style="margin-top: 2px;" value="2"  name="supplierQualificationsList" v-model="supplier.supplierQualificationsList">试验用普通耗材试剂对照品 -->
+<!-- 						  </label> -->
+<!-- 						  <label class="checkbox-inline"> -->
+<!-- 						  	<input type="checkbox" style="margin-top: 2px;" value="3"  name="supplierQualificationsList" v-model="supplier.supplierQualificationsList">实验用易制毒试剂 -->
+<!-- 						  </label> -->
+<!-- 						  <label class="checkbox-inline"> -->
+<!-- 						  	<input type="checkbox" style="margin-top: 2px;" value="4"  name="supplierQualificationsList" v-model="supplier.supplierQualificationsList">试验用危险化学品 -->
+<!-- 						  </label> -->
+					</div>
+				</div>
+				<div class="form-group">
+					<div  class="col-sm-1 control-label">电&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;话:</div>
+					<div class="col-sm-5">
+						<input maxlength="200" type="text" class="form-control" id="telephone" name="telephone" value="" v-model="supplier.telephone" placeholder="电话 "/>	
+					</div>
+				</div>
+				<div class="form-group">
+					<div  class="col-sm-1 control-label">邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱:</div>
+					<div class="col-sm-5">
+						<input maxlength="200" type="text" class="form-control" id="email" name="email" value="" v-model="supplier.email" placeholder="邮箱地址"/>	
+					</div>
+				</div>
+				<div class="form-group">
+					<div  class="col-sm-1 control-label">地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;区:</div>
+					<div class="col-sm-5">
+						<input readonly type="text" class="form-control" id="region" name="region" value="" v-model="supplier.region" placeholder="请选择地区"  @click="selectRegion"/>	
+					</div>
+				</div>
+				<div class="form-group">
+				   	<div class="col-sm-1 control-label">详&nbsp;细&nbsp;地&nbsp;址:</div>
+				   	<div class="col-sm-5">
+				      <input type="text" maxlength="200" id="address" name="address" class="form-control"  v-model="supplier.address" placeholder="详细地址"/>
+				    </div>
+				</div>
+				<div class="form-group">
+			   	<div class="col-sm-1 control-label">供&nbsp;应&nbsp;品&nbsp;种:</div>
+			   	<div class="col-sm-5">
+			   		<textarea maxlength="255" rows="5" cols="3" id="supplyType" name="supplyType" class="form-control" v-model="supplier.supplyType" placeholder="供应品种"></textarea>
+			    </div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-5 control-label"></div>
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="保存"/>
+				<input type="button" class="btn btn-warning" @click="reload" value="返回"/>	
+			</div>		
+		</form>
+	</div>	
+	<div id="selectCityPicker"  style="padding: 10px;margin-top: 30px;display: none;">
+			<input readonly  id="cityPicker"  type="text" data-toggle="city-picker" placeholder="请选择省/市"  data-level="city" value="" />
+	</div>
+</div>
+<script src="../../../../static/js/modules/busi/supplier/supplier.js"></script>
+</body>
+</html>

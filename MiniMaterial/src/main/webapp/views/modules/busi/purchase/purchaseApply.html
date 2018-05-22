@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>采购单</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/test/bootstrapValidator.min.css" >
+<link rel="stylesheet" href="../../../../static/css/test/style.css" >
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+
+</head>
+<body >
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="panel panel-default">
+            <div class="panel-heading">查询条件</div>
+            <div class="panel-body">
+                <form id="formSearch" class="form-horizontal" style="margin-bottom: 10px; margin-top: 10px;">
+	                <div class="row">
+	                	<div class="col-xs-4 col-md-4">
+							<div class="input-group">
+							    <div class="input-group-btn">物料类型
+							        <label class="btn btn-white">物料类型</label>
+							    </div>
+							    <select class="form-control" v-model="q.materielType">
+									<option value="">--请选择--</option>
+									<option v-for="item in materielTypeOptions" v-bind:value="item.code">
+										{{ item.name }}
+									</option>		
+								</select>
+							</div>                            
+						</div>
+						<div class="col-xs-4 col-md-4">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							        <label class="btn btn-white">状态</label>
+							    </div>
+						    	<select class="form-control" v-model="q.status">
+						    		<option value="">--请选择--</option>
+						    		<option value="0">未审批</option>
+						    		<option value="1">审批中</option>
+						    		<option value="2">审批通过</option>
+						    		<option value="3">审批驳回</option>
+						    		<option value="4">汇总</option>
+									<option value="6">汇总驳回</option>
+									<option value="5">汇总通过</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-xs-4 col-md-3">
+							<div class="col-xs-5"><a class="btn btn-info" @click="query" ><i class="fa fa-search"></i>查询</a></div>
+							<div class="col-xs-5"><a class="btn btn-info" @click="reset" ><i class="fa fa-refresh"></i>重置</a></div>
+						</div>
+              		 </div>
+                </form>
+			</div>
+        </div> 
+		<div style=" margin-bottom: 20px;">
+			<a v-if="hasPermission('busi:purchaseApply:add')" class="btn btn-info" style="margin-right: 20px;" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			<a v-if="hasPermission('busi:purchaseApply:update')" class="btn btn-info" style="margin-right: 20px;" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			<a v-if="hasPermission('busi:purchaseApply:delete')" class="btn btn-info" style="margin-right: 20px;" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			<a v-if="hasPermission('busi:purchaseApply:apply')" class="btn btn-info" style="margin-right: 20px;" @click="applys"><i class="fa fa-check"></i>&nbsp;提交审批</a>
+			<a v-if="hasPermission('busi:purchaseApply:detail')" class="btn btn-info" style="margin-right: 20px;" @click="setting"><i class="fa fa-plus"></i>&nbsp;添加明细</a>
+			<a v-if="hasPermission('busi:purchaseApply:recall')" class="btn btn-info" style="margin-right: 20px;" @click="recall"><i class="fa fa-play"></i>&nbsp;撤回</a>
+		</div> 
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">采购单列表</div>
+	        <div class="panel-body">
+			    <table id="jqGrid"></table>
+			    <div id="jqGridPager"></div>
+			</div>
+		</div>
+	</div>
+    
+	<div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal" id="purchaseApplyForm" style="margin-top: 20px;" onkeydown="if(event.keyCode==13){return false;}">
+			<div class="form-group">
+			   	<lable class="col-sm-1 control-label">申请主题</lable>
+			   	<div class="col-md-3">
+			    	<input maxlength="200" type="text" class="form-control" id="title" name="title" v-model="purchaseApply.title"> 
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<lable class="col-sm-1 control-label">所属物料</lable>
+			   	<div class="col-md-3">
+			   		<select class="form-control" id="materielType" name="materielType" v-model="purchaseApply.materielType">
+						<option value="">--请选择--</option>
+						<option v-for="item in materielTypeOptions" v-bind:value="item.code">
+							{{ item.name }}
+						</option>		
+					</select>
+			    </div>
+			</div>
+		
+			<div class="form-group">
+			   	<lable class="col-sm-1 control-label">审&nbsp;批&nbsp;&nbsp;人</lable>
+			   	<div class="col-md-3">
+			    	<select class="form-control" id="approver" name="approver" v-model="purchaseApply.approverId">
+						<option value="">--请选择审批人--</option>
+						<option v-for="item in approverList" v-bind:value="item.userId">{{ item.username }}</option>
+					</select>
+			    </div>
+			</div>
+			
+			<div class="form-group">
+				<div class="col-md-2 control-label"></div>
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="保存"/>&nbsp;&nbsp; 
+				<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+<script src="../../../../static/js/modules/busi/purchase/purchaseApply.js"></script>
+</body>
+</html>

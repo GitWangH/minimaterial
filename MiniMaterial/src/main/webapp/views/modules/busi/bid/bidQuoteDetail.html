@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>供应商报价名称</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/test/style.css" >
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+
+
+</head>
+<body >
+<div id="rrapp" v-cloak>
+     <div class="panel panel-default">
+		<div class="panel-heading">报价列表</div>
+        <div class="panel-body">
+		    <table id="jqGrid"></table>
+		    <div id="jqGridPager"></div>
+		</div>
+	</div>
+</div> 
+	    
+    	
+</div>
+</body>
+<script type="text/javascript">
+var enquiryId = getUrlVar('enquiryId');
+$(function () {
+	load();
+});
+
+
+function load(){
+	$("#jqGrid").jqGrid({
+    url: baseURL + 'busi/bid/quoteDetail?enquiryId='+enquiryId,
+    datatype: "json",
+    mtype: 'POST',
+    colModel: [			
+		{ label: 'id', name: 'id', index: "id", width: 100, key: true, hidden:true },
+		{ label: '供应商名称', name: 'supplierName',  sortable: false,width: 200 },
+		{ label: '报价金额', name: 'quotePrice', sortable: false,  width: 250 },
+		{ label: '报价时间', name: 'quoteDate',  sortable: false,  width: 200 },
+		{ label: '供货周期', name: 'cycle',  sortable: false, width: 150 },
+    ],
+    viewrecords: false,    //是否要显示总记录数,可修改
+    height: '80%', 
+    autowidth: true,  //如果为ture时，则当表格在首次被创建时会根据父元素比例重新调整表格宽度
+    shrinkToFit: false,  //此属性用来说明当初始化列宽度时候的计算类型，如果为ture，则按比例初始化列宽度。如果为false，则列宽度使用colModel指定的宽度
+    rownumbers: true,                      //如果为ture则会在表格左边新增一列，显示行顺序号，从1开始递增。此列名为'rn'.
+    multiselect: false,  //定义是否可以多选,可修改
+    rowNum: -1,
+    gridComplete:function(){
+    	//隐藏grid底部滚动条
+    }
+});}
+
+</script>
+</html>

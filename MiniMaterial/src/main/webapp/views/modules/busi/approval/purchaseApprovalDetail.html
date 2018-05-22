@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>采购申请单分类</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/test/style.css" >
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/plugins/laydate/laydate.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+
+</head>
+<body >
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="panel panel-default">
+			<div class="panel-heading">采购申请分类列表</div>
+	        <div class="panel-body">
+			    <table id="jqGrid"></table>
+			    <div id="jqGridPager"></div>
+			</div>
+		</div>
+    </div>
+    
+</div>
+<script src="../../../../static/js/modules/busi/approval/purchaseApprovalDetail.js"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>选择供应商</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/test/bootstrapValidator.min.css" >
+<link rel="stylesheet" href="../../../../static/css/test/style.css" >
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+<link rel="stylesheet" href="../../../../static/plugins/multiselect/multiselectstyle.css">
+<!-- <link rel="stylesheet" href="../../../../static/plugins/multiselect/multiselectstyle.css"> -->
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/libs/validator.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/plugins/laydate/laydate.js"></script>
+<script src="../../../../static/plugins/multiselect/multiselect.js"></script>
+
+
+</head>
+<body >
+<div id="rrapp" v-cloak>
+	<div class="panel panel-default">
+      <div class="panel-body" style="margin-left: 100px;">
+      		<div class="row" style="margin-top: 10px;">
+	            	<div class="form-group">
+						<lable class="col-xs-4 control-label" style="margin-top: 5px;">汇总单编号</lable>
+						<div class="col-xs-5">
+							<input type="text" class="form-control" id="summaryCode" name="summaryCode"  v-model="enquiry.summaryCode" readonly="readonly" placeholder="汇总单编号" />
+						</div>
+					</div>
+			</div>
+			
+			<div class="row" style="margin-top: 10px;">
+	            	<div class="form-group">
+						<lable class="col-xs-4 control-label" style="margin-top: 5px;">截止时间</lable>
+						<div class="col-xs-5">
+							<input type="text" class="form-control" id="enddate" name="enddate" v-model="enquiry.enddate"
+								placeholder="截止时间"  readonly="readonly" class="laydate-icon" readonly="readonly"/>
+						</div>
+					</div>
+			</div>
+      		
+      
+            <div class="row" style="margin-top: 20px;">
+<!-- 	            <div class="col-xs-6"><span class="label label-info">待选供应商</span></div> -->
+	            <div class="col-xs-6"><span class="label label-success">已选供应商</span></div>
+            </div>
+            <div class="row" style="margin-top: 20px;">
+<!-- 		        <div class="col-xs-4"> -->
+<!-- 		            <select name="from[]" id="multiselect" class="form-control" size = "20" multiple="multiple"> -->
+<!-- 		            	<option v-for="item in unSelectedlist " v-bind:value="item.id">{{ item.name }}</option> -->
+<!-- 		            </select> -->
+<!-- 		        </div> -->
+	        
+<!-- 		        <div class="col-xs-2"> -->
+<!-- 		            <button type="button" id="multiselect_rightAll" class="btn btn-block"><i class="glyphicon glyphicon-forward"></i></button> -->
+<!-- 		            <button type="button" id="multiselect_rightSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button> -->
+<!-- 		            <button type="button" id="multiselect_leftSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button> -->
+<!-- 		            <button type="button" id="multiselect_leftAll" class="btn btn-block"><i class="glyphicon glyphicon-backward"></i></button> -->
+<!-- 		        </div> -->
+		       
+		        <div class="col-xs-5">
+		            <select name="to[]" id="multiselect_to" class="form-control" size = "20" multiple="multiple">
+		            	<option v-for="item in selectedlist " v-bind:value="item.id">{{ item.name }}</option>
+		            </select>
+		        </div>
+    	</div>
+	</div>
+	<!-- <div class="row">
+	    	<div class="form-group">
+				<div class="col-sm-5 control-label"></div>
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate"value="保存" />&nbsp;&nbsp; 
+			</div>
+		</div> -->
+</div> 
+	    
+    	
+</div>
+</body>
+<script type="text/javascript">
+var enquiryId = getUrlVar('enquiryId');
+debugger ;
+console.log(enquiryId);
+$(function () {
+     $('#multiselect').multiselect();
+     debugger ;
+     multiselect_to.options = [];
+     laydate.render({
+  	  elem: '#enddate',
+  	  format: 'yyyy-MM-dd HH:mm:ss',	
+  	  type: 'datetime' ,
+  	  istime: true, //是否开启时间选择
+  	  min: 0,
+  	 done: function(value){
+		  bingDate(value);
+	  }
+  	});
+    
+});
+
+function  bingDate(value){
+	vm.enquiry.enddate = value;
+}
+
+var vm = new Vue({
+	el:'#rrapp',
+	data:{
+		enquiry: {
+			enddate: '',
+			summaryCode: '',
+		},
+		title:null,
+		unSelectedlist: [],
+		selectedlist: [],
+		ids :[],
+	},
+	created: function() {
+		this.getSupplierData();
+	},
+	methods: {
+		getSupplierData : function (){
+			debugger ;
+			var url =baseURL+"busi/purchaseQuote/getChooseSupplier" ;
+			
+			 $.ajax({
+		          url: url,
+		          type: "POST",
+		          dataType: "json",
+		          data: {
+		        	 'enquiryId' :enquiryId,
+		          },
+		          success: function(data) {
+		        	  vm.unSelectedlist = data.unSelectedlist;
+		        	  vm.selectedlist =   data.selectedlist;
+		        	  vm.enquiry.enddate = data.enddate;
+		        	  vm.enquiry.summaryCode =  data.summaryCode;
+		          },
+		          error: function() {
+		        	  alert(data.msg);
+		          }
+		      });
+		}
+	},
+});
+
+var selectSupplierCallback = function () {
+	var data = {};
+	var selectOptions = multiselect_to.options;
+	$.each( selectOptions, function(i,val){ //两个参数，第一个参数表示遍历的数组的下标，第二个参数表示下标对应的值
+		if($.inArray(val.value, vm.ids) < 0){
+			debugger;
+			vm.ids.push(val.value);
+		}
+	});
+	data.enquiryId = enquiryId;
+	data.ids = vm.ids;
+	data.enddate = vm.enquiry.enddate;
+	return data;
+}
+
+</script>
+</html>

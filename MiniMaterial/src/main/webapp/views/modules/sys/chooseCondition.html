@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+ <link rel="stylesheet" href="../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../static/css/fieldsetstyle.css"> 
+  
+
+<script src="../../../static/libs/jquery.min.js"></script>
+<script src="../../../static/plugins/layer/layer.js"></script>
+<script src="../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../static/libs/vue.min.js"></script>
+<script src="../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../static/js/common.js"></script>
+
+<link rel="stylesheet"
+	href="../../../static/plugins/bootstrap-select/bootstrap-multiselect.css">
+<script
+	src="../../../static/plugins/bootstrap-select/bootstrap-multiselect.js"></script>
+
+<style>
+.multiselect-wrapper {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    text-align: left;
+}
+
+    .multiselect-wrapper button {
+        text-align: left;
+    }
+
+    .multiselect-wrapper span {
+        margin-left: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+
+    .multiselect-wrapper .dropdown-menu {
+        width: 100%;
+    }
+
+    .multiselect-wrapper .caret {
+        position: absolute;
+        top: 13px;
+        right: 10px;
+        width: 0;
+        height: 0;
+    }
+
+    .multiselect-wrapper label.checkbox, .multiselect-wrapper label.radio {
+        padding: 3px 20px 3px 30px !important;
+        width: 100%;
+    }
+
+</style>
+</head>
+<body>
+	<div id="rrapp" v-cloak>
+		<div class="panel panel-default">
+			<div class="col-sm-12" style="margin-top: 20px;">
+				<div class="col-sm-8">
+					<div class="input-group">
+						<div class="input-group-btn">
+							<label class="btn btn-white">请求路径</label>
+						</div>
+						<input type="text"  class="form-control"   id="URL" name = "URL" />
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="col-sm-12" style="margin-top: 20px;">
+				<div class="col-sm-8">
+					<div class="input-group">
+						<div class="input-group-btn">
+							<label class="btn btn-white">查询条件</label>
+						</div>
+						<select  id="example-getting-1"  multiple="multiple"  name="xxxxx">
+							<!-- <option v-for="item in columnlist1 " v-bind:value="item.columnName">{{ item.columnName }}</option> -->
+						</select>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-sm-12" style="margin-top: 20px;">
+				<div class="col-sm-8">
+					<div class="input-group">
+						<div class="input-group-btn">
+							<label class="btn btn-white">列表展示</label>
+						</div>
+						<select  id="example-getting-2" multiple="multiple">
+							<!-- <option v-for="item in columnlist2 " v-bind:value="item.columnName">{{ item.columnName }}</option> -->
+						</select>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-sm-12" style="margin-top: 20px;">
+				<div class="col-sm-8">
+					<div class="input-group">
+						<div class="input-group-btn">
+							<label class="btn btn-white">新增修改</label>
+						</div>
+						<select  id="example-getting-3"
+							multiple="multiple">
+							<!-- <option v-for="item in columnlist3 " v-bind:value="item.columnName">{{ item.columnName }}</option> -->
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-sm-12" style="margin-top: 20px;">
+			<div class="col-sm-1 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="save" value="保存"/>
+		</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+var name = getUrlVar('name');
+var query = [];
+var list = [];
+var info = [];
+var operator = [];
+
+
+var vm = new Vue({
+	el : '#rrapp',
+	data : {
+		title : null,
+		/* columnlist1: [],
+		columnlist2: [],
+		columnlist3: [], */
+	},
+	created : function() {
+		this.loadColumn();
+	},
+	methods : {
+		loadColumn : function (){
+			var params={tableName:name};
+			debugger ;
+			var url ="/MaterialPurchasing/sys/generateCode/getTableColumn";
+            $.post(url,params,function (r) {
+            	debugger ;
+            	if(r.success){
+            		/* vm.columnlist1 = r.columnlist;	
+            		vm.columnlist2 = r.columnlist;
+            		vm.columnlist3 = r.columnlist; */
+            		
+            		var options = [] ;
+            		$.each( r.columnlist , function( key, val ) {
+            			var data = {};
+            			data.lable= val.columnName;
+            			data.title= val.columnName;
+            			data.value= val.columnName;
+            			options.push(data);
+            		} );
+            	
+           		    
+	           		 $('#example-getting-1').multiselect({
+	           			buttonWidth: "100%",
+	           	        buttonContainer: "<div class='multiselect-wrapper' />",
+	           			maxHeight: 400,
+	           	        onChange: function(element, checked) {
+	           	            if (checked === true) {
+	           	            	debugger ;
+	           	            	var value = element[0].value;
+	           	            	if($.inArray(value, query) < 0){
+	           	            		query.push(value);
+	           	            	}
+	           	            }else if (checked === false) {
+	           	            	var value = element[0].value;
+	           	            	if($.inArray(value, query) > -1){
+	           	            		query.splice($.inArray(value,query),1);
+	           	            	}
+	           	            	
+	           	            }
+	           	        }
+	           		});
+           		 	$('#example-getting-1').multiselect('dataprovider', options);
+            		
+	           		 $('#example-getting-2').multiselect({
+	           			buttonWidth: "100%",
+	           	        buttonContainer: "<div class='multiselect-wrapper' />",
+	           			maxHeight: 400,
+	           			onChange: function(element, checked) {
+	           	            if (checked === true) {
+	           	            	debugger ;
+	           	            	var value = element[0].value;
+	           	            	if($.inArray(value, list) < 0){
+	           	            		list.push(value);
+	           	            	}
+	           	            }else if (checked === false) {
+	           	            	var value = element[0].value;
+	           	            	if($.inArray(value, list) > -1){
+	           	            		list.splice($.inArray(value,list),1);
+	           	            	}
+	           	            	
+	           	            }
+	           	        }
+	           		});
+	           		$('#example-getting-2').multiselect('dataprovider', options);
+           		
+           		
+	           		$('#example-getting-3').multiselect({
+	           			buttonWidth: "100%",
+	           	        buttonContainer: "<div class='multiselect-wrapper' />",
+	           			maxHeight: 400,
+	           			onChange: function(element, checked) {
+	           	            if (checked === true) {
+	           	            	debugger ;
+	           	            	var value = element[0].value;
+	           	            	if($.inArray(value, info) < 0){
+	           	            		info.push(value);
+	           	            	}
+	           	            }else if (checked === false) {
+	           	            	var value = element[0].value;
+	           	            	if($.inArray(value, info) > -1){
+	           	            		info.splice($.inArray(value,info),1);
+	           	            	}
+	           	            	
+	           	            }
+	           	        }
+	           		});
+	           		$('#example-getting-3').multiselect('dataprovider', options);
+				}else{
+					alert(r.msg);
+				}
+            });
+		},		
+		
+		save :function (){
+			debugger ;
+			var URL = $('#URL').val();
+			if(URL == ''){
+				alert('输入请求地址');
+				return ;
+			}
+			var params={
+					URL :URL,
+					tableName:name,
+					query :query.join(),
+					list :list.join(),
+					info :info.join(),
+					operator :'',
+					
+			};
+			debugger ;
+			var url ="/MaterialPurchasing/sys/generateCode/createJS";
+            $.post(url,params,function (r) {
+            	debugger ;
+            	if(r.success){
+            		
+				}else{
+					alert(r.msg);
+				}
+            });
+		},
+	},
+});
+</script>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>报价</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/fieldsetstyle.css"> 
+<link rel="stylesheet" href="../../../../static/css/test/style.css">
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/libs/validator.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/plugins/laydate/laydate.js"></script>
+<script src="../../../../static/plugins/multiselect/multiselect.js"></script>
+
+</head>
+<body >
+	<div id="rrapp" v-cloak>
+		<div class="panel panel-default">
+	    	<div class="panel-heading"></div>
+	        <div class="panel-body">
+	        	<form id="formSearch" class="form-horizontal" style="margin-bottom: 10px; margin-top: 10px;">
+		            <div class="row" >
+		            	<div class="col-xs-4 col-md-4">
+							<div class="input-group">
+					    		<div class="input-group-btn">
+					        		<label  class="btn btn-white">报价金额</label>
+					    		</div>
+					    		<input id="quoteDetail_price" type="number" class="form-control" v-model="quoteDetail.price">
+							    <div class="input-group-btn">
+							        <label  class="btn btn-white">元</label>
+							    </div>
+							</div>                            
+						</div>
+						<div class="col-xs-4 col-md-4">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							        <label  class="btn btn-white">供货周期</label>
+							    </div>
+							    <input type="text" class="form-control" id="cycle" name="cycle" v-model="quoteDetail.cycle"
+									placeholder="供货周期" class="laydate-time-show" readonly="readonly"  onClick="setDayH(this);"/>
+							</div>                            
+						</div>
+		      		</div>
+	            </form>
+			</div>
+	    </div> 
+		<div class="panel panel-default">
+			<div class="panel-heading">报价列表</div>
+	        <div class="panel-body">
+			    <table id="jqGrid"></table>
+			    <div id="jqGridPager"></div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+var quoteId = getUrlVar('quoteId');
+
+$(function () {
+    load();
+    laydate.render({
+   	  elem: '#cycle',
+   	  format: 'yyyy-MM-dd HH:mm:ss',	
+   	  type: 'datetime' ,
+   	  istime: true, //是否开启时间选择
+   	  min: 0,
+   	  done: function(value){
+	  	bingDate(value);
+ 	  }
+   	});
+});
+
+function  bingDate(value){
+	vm.quoteDetail.cycle = value;
+}
+
+function load(){
+	var lastsel ;
+	$("#jqGrid").jqGrid({
+    url: baseURL + 'busi/purchaseQuote/queryDetail?quoteId='+quoteId,
+    datatype: "json",
+    mtype: 'POST',
+    colModel: [
+		{ label: 'id', name: 'id', index: "id", width: 50, key: true, hidden:true },
+		{ label: '物料名称', name: 'materielName',  sortable: false,width: 100,  },
+		{ label: '数量', name: 'quantity',  sortable: false,width: 250},
+		{ label: '单位', name: 'unit',   sortable: false, width:250 },
+		{ label: '型号', name: 'specifications',   sortable: false,  width:250 },
+		{ label: '总价', name: 'quotePrice',sortable: false,  width:150,editable: true, editrules:{
+            required : true,
+            //number :true,
+            custom:true,
+            custom_func:function(value, colNames){
+            	var r = /^(([1-9]\d*)|\d)(\.\d{0,2})?$/;
+	           	 if(!r.test(value)){
+	           		 return [false, "非法的总价"];  
+	           	 }else{
+                    return [true,""];
+                } 
+           }
+       } },
+		{ label: '备注', name: 'remark',   sortable: false,  width:250 },
+    ],
+    viewrecords: true,
+	shrinkToFit: false,
+	height:'auto',
+    rowNum: 10,
+	//rowList : [10,30,50,100],
+    rownumbers: true, 
+    autowidth:true,
+    multiselect: true,
+    sortorder: 'desc', 
+    sortname: 'id', 
+    pager: "#jqGridPager",
+    jsonReader : {
+        root: "page.content",
+        page: "page.currentPage",
+        total: "page.pageCount",
+        records: "page.totalCount"
+    },
+    prmNames : {
+        page:"page", 
+        rows:"limit", 
+        order: "order"
+    },
+    ondblClickRow: function(id){
+        //if(id && id !== lastsel){
+            var rowData = $("#jqGrid").jqGrid("getRowData", id);   
+            $('#jqGrid').jqGrid('restoreRow',lastsel);  
+            $('#jqGrid').jqGrid('editRow',id,{  
+                keys : true,        //这里按[enter]保存  
+                url: baseURL + 'busi/purchaseQuote/savePrice',  
+                mtype : "POST",
+                restoreAfterError: true,
+                extraparam: {
+                    "id": rowData.id,  
+                    "quotePrice": $("#"+id+"quotePrice").val(),  
+                },  
+                oneditfunc: function(rowid){  
+                },  
+                successfunc: function(response){  
+                	debugger ;
+                	if(!response.responseJSON.success){
+                		alert(response.responseJSON.msg);
+                	} else {
+	                	vm.quoteDetail.price = response.responseJSON.price;
+	                	//setPrice(response.responseJSON.price);
+                	}
+//                 	vm.reload(); 
+                    return true;  
+                },   
+                errorfunc: function(rowid, res){  
+                	debugger ;
+                }  
+            });  
+        	lastsel = id;
+       // }  
+    },
+    gridComplete:function(){
+    }
+});}
+
+function setDayH(obj){
+	debugger;
+	tiannetOutObject = obj;
+	m_bolShowHour = true;
+	//如果标签中有值，则将日期和小时初始化为当前值
+	var strValue = tiannetTrim(tiannetOutObject.value);
+	if( strValue != "" ){
+	tiannetInitDate(strValue.substring(0,10));
+	var hour = strValue.substring(11,13);
+	if( hour < 10 ) tiannetHour = hour.substring(1,2);
+	}
+	tiannetPopCalendar();
+	}
+var vm = new Vue({
+	el:'#rrapp',
+	data:{
+		quoteDetail: {
+			price:'0.00',
+			cycle :'',
+		},
+		title:null,
+	},
+	created: function() {
+		this.loadData();
+	},
+	methods: {
+		loadData :function (){
+			var url =baseURL+"busi/purchaseQuote/getQuotePrice" ;
+			$.ajax({
+		          url: url,
+		          type: "POST",
+		          dataType: "json",
+		          data: {
+		        	 'id' :quoteId,
+		          },
+		          success: function(r) {
+		        	  vm.quoteDetail.price= r.price;
+		        	  vm.quoteDetail.cycle= r.cycle;
+		          },
+		          error: function() {
+		        	  alert(data.msg);
+		          }
+		     }); 
+		},
+	},
+});
+
+var getSupplierQouteCallback = function () {
+	debugger;
+	var data = {};
+	data.price = vm.quoteDetail.price;
+	data.cycle = vm.quoteDetail.cycle;
+	data.id = quoteId;
+	return data;
+}
+
+</script>
+</html>

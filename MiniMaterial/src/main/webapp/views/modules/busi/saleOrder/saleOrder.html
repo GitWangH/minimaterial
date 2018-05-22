@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>销售明细</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+<link rel="stylesheet" href="../../../../static/css/fieldsetstyle.css">
+<link rel="stylesheet" href="../../../../static/plugins/laydate/theme/default/laydate.css"></script>
+
+<link rel="stylesheet" href="../../../../static/css/address/city-picker.css"> 
+
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/plugins/laydate/laydate.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/libs/validator.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+<script src="../../../../static/libs/jquery-migrate-1.1.0.js"></script>
+<script src="../../../../static/plugins/jquery-autocomplete/jquery.autocomplete.js"></script>
+<script src="../../../../static/libs/jQuery.print.js"></script>
+
+<script src="../../../../static/js/city-picker.data.js"></script>
+<script src="../../../../static/js/city-picker.js"></script>
+
+<style id ="style">
+<style type="text/css">
+table.tftable {
+	font-size: 12px;
+	color: #333333;
+	width: 100%;
+	border-width: 1px;
+	border-color: #a9a9a9;
+	border-collapse: collapse;
+}
+
+
+table.tftable th {
+	font-size: 12px;
+	background-color: #ffffff;
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #a9a9a9;
+	text-align: center;
+}
+
+table.tftable tr {
+	background-color: #ffffff;
+}
+
+table.tftable td {
+	font-size: 12px;
+	border-width: 1px;
+	/* width:150px; */
+	padding: 8px;
+	border-style: solid;
+	border-color: #a9a9a9;
+	text-align: center;
+}
+
+table.tftable1 td {
+	font-size: 12px;
+	border-width: 0px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #a9a9a9;
+	text-align: left;
+}
+
+.divhead {
+	margin: 0 auto;
+	width: 200px;
+	height: 40px;
+}
+
+.divhead1 {
+	margin: 0 auto;
+	width: 450px;
+	height: 20px;
+}
+
+.divhead2 {
+	margin: 0 auto;
+	width: 400px;
+	height: 20px;
+}
+
+.divhead2 {
+	height: 30px;
+}
+
+.div-left {
+	width: 60px;
+	height: 20px;
+	float: left;
+	margin-top: 20px;
+}
+
+.div-right {
+	width: 250px;
+	height: 20px;
+	float: right
+}
+
+.div-header1 {
+	margin: 0 auto;
+	text-align: center
+}
+
+.div-left {
+	width: 300px;
+	float: left;
+	padding-bottom: 30px;
+}
+
+.div-right {
+	width: 150px;
+	float: right;
+	padding-bottom: 30px;
+	margin-top: 20px;
+}
+
+.div-part1 {
+	float: left;
+	padding-left: 100px;
+}
+
+.div-part2 {
+	float: left;
+	padding-left: 140px;
+}
+
+.div-part3 {
+	float: left;
+    padding-left: 140px;
+}
+
+.divPart4 {
+	float: left;
+	padding-left: 100px;
+}
+
+.divpart3{
+	float: left;
+    padding-left: 190px;
+}
+
+</style>
+
+</head>
+<body >
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="panel panel-default">
+            <div class="panel-heading">查询条件</div>
+            <div class="panel-body">
+                <form id="formSearch" class="form-horizontal">
+                    <div class="form-group" >
+                         <label class="control-label col-sm-1-1">单据编号</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="q_orderCode" name="q_orderCode" v-model="q.q_orderCode">
+                        </div>
+                        
+                        <label class="control-label col-sm-1-1">客户名称</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="q_customerName" name="q_customerName" v-model="q.q_customerName">
+                        </div>
+                        
+                        <label class="control-label col-sm-1-1">日期</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="q_orderDate" name="q_orderDate" v-model="q.q_orderDate">
+                        </div>
+                        
+                    </div>
+                    <div class="col-sm-12" style="text-align:right;">
+                           <a class="btn btn-info" @click="query" style="margin-right: 20px;"><i class="fa fa-search"></i>查询</a>
+						   <a class="btn btn-info" @click="reset" style="margin-right: 20px;"><i class="fa fa-refresh"></i>重置</a>
+                    </div>
+                    
+                </form>
+                <div id="exportExecl" style="display: none; padding: 10px;">
+				<form method="post" id="submitForm" action="" >
+					<input id="execl_customer" name="execl_customer" value=""/>
+					<input id="execl_orderDate" name="execl_orderDate" value=""/>
+					<input id="execl_orderCode" name="execl_orderCode" value=""/>
+					<input id="serviceName" name=serviceName value=""/>
+				</form>
+			</div>
+            </div>
+        </div> 
+		<div style=" margin-bottom: 20px;">
+			<a v-if="hasPermission('busi:saleOrder:update')" class="btn btn-warning" style="margin-right: 20px;" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			<a v-if="hasPermission('busi:saleOrder:exportData')" class="btn btn-info" style="margin-right: 20px;" @click="exportData"><i class="fa fa-download"></i>&nbsp;导出execl</a>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">销售明细列表</div>
+	        <div class="panel-body">
+			    <table id="jqGrid"></table>
+			    <div id="jqGridPager"></div>
+			</div>
+		</div>
+    </div>
+    
+     <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal" id="orderFrom"  style="margin-top: 20px;" onkeydown="if(event.keyCode==13){return false;}">
+			
+			<div class="form-group">
+					<lable class="col-sm-1 control-label">单据编号</lable>
+					<div class="col-sm-4">
+						<input type="text" class="form-control" value="" v-model="order.orderCode" placeholder="单据编号" readonly/>
+					</div>
+					<lable class="col-sm-1 control-label">销售日期</lable>
+					<div class="col-sm-4">
+						<input type="text" class="form-control" id="orderDate" name="orderDate" value="" v-model="order.orderDate"
+							placeholder="销售日期"  readonly  />
+					</div>
+			</div>
+			
+			<div class="form-group">
+				<lable class="col-sm-1 control-label">省份</lable>
+				<div class="col-sm-4"  >
+					 <input readonly  id="provinces" name="provinces" v-model="order.provinces" class="form-control" type="text" placeholder="请选择地区"/ >
+					 
+				</div>
+				
+				<lable class="col-sm-1 control-label">城市</lable>
+				<div class="col-sm-4"  >
+					 <input readonly  id="city" name="city" v-model="order.city" class="form-control" type="text" placeholder="请选择地区" />
+				</div>
+				
+			</div>
+			
+			<div class="form-group">
+					<lable class="col-sm-1 control-label">客户</lable>
+					<div class="col-sm-4">
+						<input type="text" class="form-control" value="" id="customerName" name ="customerName"  v-model="order.customerName" placeholder="客户" readonly/>
+					</div>
+					<lable class="col-sm-1 control-label">收货人</lable>
+					<div class="col-sm-4">
+						<input type="text" class="form-control" id="consigneeName" 
+							name="consigneeName" value="" v-model="order.consigneeName"  placeholder="收货人"  readonly />
+					</div>
+			</div>
+			
+			<div class="form-group">
+					<lable class="col-sm-1 control-label">收货电话</lable>
+					<div class="col-sm-4">
+						<input type="text" class="form-control" id="consigneeMobile" name="consigneeMobile" value="" v-model="order.consigneeMobile" placeholder="收货电话" readonly/>
+					</div>
+					<lable class="col-sm-1 control-label">收货地址</lable>
+					<div class="col-sm-4">
+						<input type="text" class="form-control" id="consigneeAddress" 
+							name="consigneeAddress" value="" v-model="order.consigneeAddress" placeholder="收货地址" readonly />
+					</div>
+			</div>
+			
+			<div class="form-group">
+			   	<lable class="col-sm-1 control-label">发货方式</lable>
+			   	<div class="col-sm-4">
+			   		<input type="text" class="form-control" value="" id="deliverType" name="deliverType" v-model="order.deliverType" readonly /> 
+			    </div>
+			    
+			    <lable class="col-sm-1 control-label">省区经理</lable>
+			   	<div class="col-sm-4">
+			    	<input type="text" class="form-control" value="" id="provincesManager" name="provincesManager" v-model="order.provincesManager" readonly/> 
+			    </div>
+			</div>
+			
+			<div class="form-group">
+				<lable class="col-sm-1 control-label">产品类别</lable>
+				<div class="col-sm-4">
+					<input type="text" readonly class="form-control" value="" id="productType" name="productType" v-model="order.productType" placeholder="产品类别"/>
+				</div>
+				
+			   	<lable class="col-sm-1 control-label">产品名称</lable>
+			   	<div class="col-sm-4">
+			    	<input type="text" readonly class="form-control"   id="productName" name="productName" v-model="order.productName"  placeholder="产品名称"/> 
+			    </div>
+			</div>
+			<div class="form-group">
+			    <lable class="col-sm-1 control-label">规&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;格</lable>
+			   	<div class="col-sm-4">
+			    	<input type="text" readonly class="form-control"  value="" id="productSpecification" name="productSpecification" v-model="order.productSpecification" placeholder="规格"/> 
+			    </div>
+			    
+			    <lable class="col-sm-1 control-label">件&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数</lable>
+				<div class="col-sm-4">
+					<input type="text"  readonly  class="form-control" value="" id="amount" name="amount" v-model="order.amount" placeholder="件数"/>
+				</div>
+				
+			</div>
+			
+			
+			<div class="form-group">
+				<lable class="col-sm-1 control-label">盒&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数</lable>
+				<div class="col-sm-4">
+					<input type="text" readonly  class="form-control" value="" id="boxAmount" name="boxAmount" v-model="order.boxAmount" placeholder="盒数"/>
+				</div>
+				
+				<lable class="col-sm-1 control-label">每盒单价</lable>
+				<div class="col-sm-4">
+					<input type="text"  readonly class="form-control" value="" id="unitPrice" name="unitPrice" v-model="order.unitPrice" placeholder="每盒单价"/>
+				</div>
+				
+			</div>
+			
+			
+			<div class="form-group">
+				
+				<lable class="col-sm-1 control-label">金额</lable>
+				<div class="col-sm-4">
+					<input type="text"  readonly class="form-control" value="" id="totalPrice" name="totalPrice" v-model="order.totalPrice" placeholder="每盒单价"/>
+				</div>
+			
+				<lable class="col-sm-1 control-label">批&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号</lable>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" value="" id="batchCode" name="batchCode" v-model="order.batchCode" placeholder="批号" />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<lable class="col-sm-1 control-label">备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注</lable>
+				<div class="col-sm-9">
+					<input type="text" class="form-control" value="" id="remark" name="remark" v-model="order.remark" placeholder="备注"/>
+				</div>
+			</div>
+			
+
+
+			<div class="form-group">
+				<div class="col-sm-5 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="保存"/>&nbsp;&nbsp;
+				<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div> 
+		</form>
+	</div>
+</div>
+<script src="../../../../static/js/modules/busi/saleOrder/saleOrder.js"></script>
+</body>
+</html>

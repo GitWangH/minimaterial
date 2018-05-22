@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TODO</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/test/style.css" >
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/plugins/laydate/laydate.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+
+
+
+</head>
+<body >
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="panel panel-default">
+            <div class="panel-heading">查询条件</div>
+            <div class="panel-body">
+               <form id="formSearch" class="form-horizontal"style="margin-bottom: 10px; margin-top: 10px;" >
+                   <div class="row">
+	                	<div class="col-xs-4 col-md-4">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							        <label  class="btn btn-white">物料名称</label>
+							    </div>
+							      <input type="text" class="form-control"  v-model="q.materielName">
+							</div>                            
+						</div>
+						<div class="col-xs-4 col-md-3">
+							<div class="col-xs-5"><a class="btn btn-info" @click="query" ><i class="fa fa-search"></i>查询</a></div>
+							<div class="col-xs-5"><a class="btn btn-info" @click="reset" ><i class="fa fa-refresh"></i>重置</a></div>
+						</div>
+              		 </div>
+                </form>
+			</div>
+        </div> 
+		<div class="panel panel-default">
+			<div class="panel-heading">验收单明细列表</div>
+	        <div class="panel-body">
+			    <table id="jqGrid"></table>
+			    <div id="jqGridPager"></div>
+			</div>
+		</div>
+    </div>
+</div>
+<script type="text/javascript">
+
+var acceptanceId = getUrlVar('acceptanceId');
+$(function () {
+    load();
+});
+function load(){
+	var lastsel ;
+	$("#jqGrid").jqGrid({
+    url: baseURL + 'busi/acceptanceDetail/list?acceptanceId='+acceptanceId,
+    datatype: "json",
+    mtype: 'POST',
+    colModel: [			
+		{ label: 'id', name: 'id', index: "id", width: 50, key: true, hidden:true },
+		{ label: '物料名称', name: 'materielName', index:'materielName',  width: 250 },
+		{ label: '物料类型', name: 'materielType',   width: 100, hidden: true},
+		/* { label: '物料类型', name: 'materielTypeName',   width: 200}, */
+		{ label: '规格', name: 'specifications',  sortable: false, width: 160 },
+		{ label: '数量', name: 'quantity', sortable: false, width: 50},
+		{ label: '单位', name: 'unit', sortable: false, width: 70 },
+		{ label: '厂家', name: 'manufactor',  sortable: false,  width: 150 },
+		{ label: '是否合格', name: 'status', sortable: false, width: 100, editable : true, edittype:'select', formatter:'select', editoptions:{value:"1:合格;2:不合格"}},
+		{ label: '不合格数量', name: 'unqualifiedQuantity',  sortable: false,  width: 100, editable : true, editrules:{
+			             required : true,
+			             //+number :true,
+			             custom:true,
+                         custom_func:function(value, colNames){ 
+                        	 var r = /^[0-9]\d*$/;
+                        	 if(!r.test(value)){
+                        		 return [false, "非法的不合格数量"];  
+                        	 }else{
+                                 return [true,""];
+                             } 
+                        }
+			        } },
+		{ label: '不合格说明', name: 'unqualifiedExplain', sortable: false,  width: 200, editable : true, },
+		{ label: '验收人', name: 'createname',   sortable: false, width: 150 },
+		{ label: '验收时间', name: 'createdate',  index:'createdate',  width: 200 },
+		],
+		viewrecords: true,
+		shrinkToFit: false,
+		height:'auto',
+	    rowNum: 10,
+		rowList : [10,30,50,100],
+	    rownumbers: true, 
+	    autowidth:true,
+	  //  multiselect: true,
+	    sortorder: 'desc', 
+	    //sortname: 'createdate', 
+	    pager: "#jqGridPager",
+	    jsonReader : {
+	        root: "page.content",
+	        page: "page.currentPage",
+	        total: "page.pageCount",
+	        records: "page.totalCount"
+	    },
+	    prmNames : {
+	        page:"page", 
+	        rows:"limit", 
+	        order: "order"
+	    },
+	    gridComplete:function(){
+	    	
+	    },
+	    ondblClickRow: function(id){  
+	        //if(id && id !== lastsel){  
+	            var rowData = $("#jqGrid").jqGrid("getRowData", id);   
+	            $('#jqGrid').jqGrid('restoreRow',lastsel);  
+	            $('#jqGrid').jqGrid('editRow',id,{  
+	                keys : true,        //这里按[enter]保存  
+	                url: baseURL + 'busi/acceptanceDetail/update',  
+	                mtype : "POST",  
+	                restoreAfterError: true,  
+	                extraparam: {  
+	                    "id": rowData.id,  
+	                    "status": $("#"+id+"_status").val(),  
+	                    "unqualifiedQuantity": $("#"+id+"_unqualifiedQuantity").val(),  
+	                },  
+	                oneditfunc: function(rowid){  
+	                },  
+	                successfunc: function(response){  
+	                	debugger ;
+	                	if(!response.responseJSON.success){
+	                		alert(response.responseJSON.msg);
+	                	}
+	                	vm.reload(); 
+	                    return true;  
+	                },   
+	                errorfunc: function(rowid, res){  
+	                	debugger ;
+	                }  
+	            });  
+	        	lastsel = id;
+	       // }  
+	    }  
+});}
+
+
+var vm = new Vue({
+	el:'#rrapp',
+	data:{
+		q:{
+			materielName:'',
+		},
+		showList:true,
+	},
+	created: function() {
+		
+	},
+	methods: {
+		query: function () {
+			vm.reload();
+		},
+		reset: function() {
+			vm.q.materielName = '',
+			vm.reload();
+		},
+		saveOrUpdate: function () {
+		},
+		reload: function () {
+			vm.showList = true;
+			var page = $("#jqGrid").jqGrid('getGridParam','page');
+			$("#jqGrid").jqGrid('setGridParam',{ 
+                postData:{
+                	'materielName': vm.q.materielName,
+                	'acceptanceId':acceptanceId,
+                },
+        	    datatype: "json",
+     	        mtype: 'POST',
+                page:1
+            }).trigger("reloadGrid");
+		},
+	},
+});
+
+</script>
+</body>
+</html>

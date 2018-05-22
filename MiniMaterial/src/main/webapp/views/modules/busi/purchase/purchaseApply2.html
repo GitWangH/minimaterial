@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>采购单</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+ <link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/fieldsetstyle.css"> 
+<link href="../../../../static/css/test/style.css" rel="stylesheet">
+<!-- <link href="../../../../static/css/test/bootstrap.min.css" rel="stylesheet"> -->
+<!-- <link href="../../../../static/css/test/font-awesome.css" rel="stylesheet">
+<link href="../../../../static/css/test/bootstrapValidator.min.css" rel="stylesheet">
+<link href="../../../../static/css/test/animate.css" rel="stylesheet"> -->
+<!-- <link href="../../../../static/css/test/_fstyle.css" rel="stylesheet"> -->
+  
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/plugins/laydate/laydate.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/libs/validator.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+<script src="../../../../static/libs/jquery-migrate-1.1.0.js"></script>
+<script src="../../../../static/plugins/jquery-autocomplete/jquery.autocomplete.js"></script>
+<script src="../../../../static/libs/jQuery.print.js"></script>
+
+<script src="../../../../static/js/city-picker.data.js"></script>
+<script src="../../../../static/js/city-picker.js"></script>
+
+
+</head>
+<body >
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="panel panel-default">
+            <div class="panel-heading">查询条件</div>
+            <div class="panel-body">
+                <form id="formSearch" class="form-horizontal" >
+	                <div class="col-sm-12" style="margin-top: 10px;">
+	                	<div class="col-sm-3">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							        <label  class="btn btn-white">物料名称</label>
+							    </div>
+							     <input type="text" class="form-control" id="productName" name="productName" v-model="q.productName">
+							</div>                            
+						</div>
+						
+						<div class="col-sm-3">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							       <label  class="btn btn-white">物料名称</label>
+							    </div>
+							    <input type="text" class="form-control" id="roleName" placeholder="">
+							</div>                            
+						</div>
+						
+						<div class="col-sm-3">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							      <label  class="btn btn-white">物料名称</label>
+							    </div>
+							    <input type="text" class="form-control" id="roleName" placeholder="">
+							</div>                            
+						</div>
+						
+	               </div>
+               
+	                <div class="col-sm-12" style="margin-top: 10px;">
+	                	<div class="col-sm-3">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							        <label  class="btn btn-white">物料名称</label>
+							    </div>
+							    <input type="text" class="form-control" id="roleName" placeholder="">
+							</div>                            
+						</div>
+						<div class="col-sm-3">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							        <label  class="btn btn-white">物料名称</label>
+							    </div>
+							    <input type="text" class="form-control" id="roleName" placeholder="">
+							</div>                            
+						</div>
+						<div class="col-sm-3">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							       <label  class="btn btn-white">物料名称</label>
+							    </div>
+							    <input type="text" class="form-control" id="roleName" placeholder="">
+							</div>                            
+						</div>
+						<div class="col-lg-2 col-sm-3">
+							<div class="row">
+								<div class="col-lg-12 col-sm-12">
+									<a class="btn btn-info" @click="query" style="margin-right: 20px;"><i class="fa fa-search"></i>查询</a>
+									<a class="btn btn-info" @click="reset" style="margin-right: 20px;"><i class="fa fa-refresh"></i>重置</a>
+								</div>
+							</div>
+						</div>
+              		 </div>
+                </form>
+			</div>
+        </div> 
+		<div style=" margin-bottom: 20px;">
+					<!-- <a v-if="hasPermission('busi:saleOrder:update')" class="btn btn-warning" style="margin-right: 20px;" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+					<a v-if="hasPermission('busi:saleOrder:exportData')" class="btn btn-info" style="margin-right: 20px;" @click="exportData"><i class="fa fa-download"></i>&nbsp;导出execl</a> -->
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">采购单列表</div>
+	        <div class="panel-body">
+			    <table id="jqGrid"></table>
+			    <div id="jqGridPager"></div>
+			</div>
+		</div>
+    </div>
+    
+     <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal" id="orderFrom"  style="margin-top: 20px;" onkeydown="if(event.keyCode==13){return false;}">
+		</form>
+	</div>
+</div>
+<script src="../../../../static/js/modules/busi/purchaseApply/purchaseApply.js"></script>
+</body>
+</html>

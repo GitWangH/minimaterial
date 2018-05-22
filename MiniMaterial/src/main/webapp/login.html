@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>耗材采购管理系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+        <link rel="stylesheet" href="static/css/loginstyle.css">
+        
+        <link href="static/css/login/base.css" rel="stylesheet"/>
+        <link href="static/css/login/iconfont.css"  rel="stylesheet"/>
+        <link href="static/css/login/reg.css" rel="stylesheet" />
+        
+  </head>
+<body>
+<div class="cont" id="rrapp"></div>
+        <div  v-cloak class="wrap">
+            <div class="wpn">
+                <div class="form-data pos">
+                    <a href=""><img src="static/css/login/login-logo.png" class="head-logo"></a> 
+                    <div class="change-login">
+                        <p class="account_number on">耗材采购管理系统</p>
+                    </div>
+                    <div class="form1">
+                        <p class="p-input pos">
+                            <label for="num">请输入用户名</label>
+                            <input type="text" id="num"   >
+                            <span class="tel-warn num-err hide"><em>账号或密码错误，请重新输入</em><i class="icon-warn"></i></span>
+                        </p>
+                        <p class="p-input pos">
+                            <label for="pass">请输入密码</label>
+                            <input type="password" style="display:none">
+                            <input type="password" id="pass" autocomplete="new-password">
+                            <span class="tel-warn pass-err hide"><em>账号或密码错误，请重新输入</em><i class="icon-warn"></i></span>
+                        </p>
+                    </div>
+                    <button class="lang-btn off log-btn">登录</button>
+                </div>
+            </div>
+        </div>
+
+<script src="static/libs/jquery.min.js"></script>
+ <script src="static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="static/libs/vue.min.js"></script>
+<script src="static/libs/bootstrap.min.js"></script>
+<script src="static/plugins/layer/layer.js"></script>
+<script src="static/js/common.js"></script>
+<script src="static/js/agree.js"></script>
+<script src="static/js/login.js"></script>
+  </body>
+</html>

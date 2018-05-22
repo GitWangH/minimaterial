@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>采购单</title>
+<meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/fieldsetstyle.css">
+<link rel="stylesheet" href="../../../../static/css/test/style.css" >
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/plugins/laydate/laydate.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/libs/validator.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+
+</head>
+<body>
+	<div  v-cloak>
+		<div class="row" style="margin-left: 15px; margin-right: 15px;">
+			<div class="tabs-container" id="myTab">
+				<ul class="nav nav-tabs" role="tablist" id="maintab">
+					<li class="active"><a href="#tab1" aria-expanded="true"
+						onclick='showPage("tab1","../../../../views/modules/busi/work/agency.html")'>我的待办</a></li>
+					<li class=""><a href="#tab2" aria-expanded="false"
+						onclick='showPage("tab2","../../../../views/modules/busi/work/agency2.html")'>我的已办</a></li>
+				</ul>
+				<!-- Tab panes -->
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab1" style="width: 100%;"></div>
+					<div class="tab-pane" id="tab2" style="width: 100%; "></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	$(function() {
+		showPage("tab1","../../../../views/modules/busi/work/agency.html");
+	});
+	function showPage(tabId, url) {
+		$('#maintab a[href="#' + tabId + '"]').tab('show'); // 显示点击的tab页面
+		$('#' + tabId).load(url); // ajax加载页面
+	}
+</script>
+
+</script>
+</html>

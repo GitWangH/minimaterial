@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>采购单汇总分类</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/test/style.css">
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/plugins/laydate/laydate.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+
+
+</head>
+<body >
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="panel panel-default">
+            <div class="panel-body">
+                <form id="formSearch" class="form-horizontal" style="margin-bottom: 10px; margin-top: 10px;">
+	                <div class="row" >
+	                	<div class="col-md-3">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							        <label  class="btn btn-white">审批结果</label>
+							    </div>
+							    <select class="form-control"  v-model="result.approve" >
+								  <option value="1">同意</option>
+								  <option value="2" >驳回</option>
+								</select>
+							</div>                            
+						</div>
+						<div class="col-md-9">
+							<div class="input-group">
+							    <div class="input-group-btn">
+							        <label  class="btn btn-white">审批意见</label>
+							    </div>
+							    <input class="form-control"  v-model="result.approveMsg"></textarea>
+							</div>                            
+						</div>
+              		 </div>
+                </form>
+			</div>
+        </div> 
+		<div class="panel panel-default">
+			<div class="panel-heading">采购申请列表</div>
+	        <div class="panel-body">
+			    <table id="jqGrid"></table>
+			    <div id="jqGridPager"></div>
+			</div>
+		</div>
+    </div>
+    
+</div>
+<script src="../../../../static/js/modules/busi/work/dealSummaryClassify.js"></script>
+</body>
+</html>

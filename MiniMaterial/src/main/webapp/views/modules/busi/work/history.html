@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>代办</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../../../static/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/bootstrapValidator.min.css">
+<link rel="stylesheet" href="../../../../static/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../../../static/css/fieldsetstyle.css"> 
+<link rel="stylesheet" href="../../../../static/css/test/style.css">
+<link rel="stylesheet" href="../../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+
+
+<script src="../../../../static/libs/jquery.min.js"></script>
+<script src="../../../../static/plugins/layer/layer.js"></script>
+<script src="../../../../static/plugins/laydate/laydate.js"></script>
+<script src="../../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../../static/libs/vue.min.js"></script>
+<script src="../../../../static/libs/bootstrapValidator.min.js"></script>
+<script src="../../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../../../static/js/common.js"></script>
+</head>
+<body >
+<div class="row">
+		<div class="panel panel-default" style="padding:25px">
+	        <div class="panel-body">
+			    <table id="jqGrid" ></table>
+			    <div id="jqGridPager"></div>
+			</div>
+		</div>
+       
+</div>    
+<div style="margin-top:-180px;">
+    <img id="imageHtml" />
+</div>
+</body>
+<script type="text/javascript">
+var instanceId = getUrlVar('instanceId');
+$(function () {
+    load();
+    loadImage();
+});
+
+function load(){
+	$("#jqGrid").jqGrid({
+    url: baseURL + 'act/deal/history?instanceId='+instanceId,
+    datatype: "json",
+    mtype: 'POST',
+    colModel: [			
+		{ label: 'id', name: 'id', index: "id", width: 50, key: true, hidden:true },
+		{ label: '任务名称', name: 'taskName',  sortable: false,width: 250 },
+		{ label: '预处理人', name: 'advanceName',  sortable: false,width: 150 },
+		{ label: '处理人', name: 'dealName',  sortable: false,width: 150 },
+		{ label: '处理时间', name: 'dealTime',  sortable: false,  width:150 },
+		{ label: '审批结果', name: 'appAction',  sortable: false,  width: 150, formatter: function(value, options, row){
+			if(value == null || value==''){
+				return '' ;
+			}else if(value == 1){
+				return '同意' ;
+			}else if(value == 2){
+				return '驳回' ;
+			}
+		}},
+		{ label: '审批意见', name: 'appOpinion', sortable: false,   width: 400 },
+		],
+	viewrecords: false,
+	shrinkToFit: false,
+	height:'50%',
+	width:"auto",
+    gridComplete:function(){
+    	$("#jqGrid").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" }); 
+    }
+});}
+
+function loadImage(){
+	debugger ;
+	$('#imageHtml').attr("src",  baseURL+"/act/deal/showFlowImg?processInstanceId="+instanceId);
+}
+
+
+
+</script>
+
+</html>
